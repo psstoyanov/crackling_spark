@@ -83,6 +83,15 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     });
     message.animationController.forward();
   }
+
+  // If the app consists from more screen, the framework will invoke this method and clear
+  // the animation resources.
+  @override
+  void dispose(){
+    for (ChatMessage message in _messages)
+      message.animationController.dispose();
+    super.dispose();
+  }
 }
 
 class ChatMessage extends StatelessWidget {
@@ -93,8 +102,8 @@ class ChatMessage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return new SizeTransition(
-      sizeFactor:
-          new CurvedAnimation(parent: animationController, curve: Curves.decelerate),
+      sizeFactor: new CurvedAnimation(
+          parent: animationController, curve: Curves.decelerate),
       axisAlignment: -20.0, // Useful to make the animation more "believable"
       child: new Container(
         margin: new EdgeInsets.symmetric(vertical: 8.0),
