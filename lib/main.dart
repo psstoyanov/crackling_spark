@@ -15,7 +15,14 @@ class CracklingsparkApp extends StatelessWidget {
   }
 }
 
-class ChatScreen extends StatelessWidget{
+// Modify the ChatScreen class definition to extend StatefulWidget.
+class ChatScreen extends StatefulWidget{
+  @override
+  State createState() => new ChatScreenState();
+}
+
+// Add the ChatScreenState class definition in main.dart.
+class ChatScreenState extends State<ChatScreen> {
   @override
   Widget build(BuildContext context){
     return new Scaffold(
