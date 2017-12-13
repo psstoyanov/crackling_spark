@@ -15,20 +15,39 @@ class CracklingsparkApp extends StatelessWidget {
   }
 }
 
-// Modify the ChatScreen class definition to extend StatefulWidget.
 class ChatScreen extends StatefulWidget{
   @override
   State createState() => new ChatScreenState();
 }
 
-// Add the ChatScreenState class definition in main.dart.
 class ChatScreenState extends State<ChatScreen> {
+  // Add a TextEditingController to manage the interaction with the text field
+  final TextEditingController _textController = new TextEditingController();
+
+  Widget _buildTextComposer(){
+    return new Container(
+      margin: const EdgeInsets.symmetric(horizontal: 8.0),
+      child: new TextField(
+        controller: _textController,
+        onSubmitted: _handleSubmitted,
+        decoration: new InputDecoration.collapsed(
+          hintText: "Send text message"
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context){
     return new Scaffold(
       appBar: new AppBar(
         title:new Text('Crackling Spark')
         ),
+        body: _buildTextComposer(),
     );
+  }
+
+  void _handleSubmitted(String value) {
+      _textController.clear();
   }
 }
