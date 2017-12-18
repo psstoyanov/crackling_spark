@@ -103,7 +103,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
           decoration: Theme.of(context).platform == TargetPlatform.iOS
               ? new BoxDecoration(
                   border:
-                      new Border(top: new BorderSide(color: Colors.grey[200])))
+                      new Border(top: new BorderSide(color: Colors.grey[500])))
               : null,
         ));
   }
