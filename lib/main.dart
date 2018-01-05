@@ -3,10 +3,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
 // Asyn package
-import 'dart:async'; 
+import 'dart:async';
 
 // Add google signin package
-import 'package:google_sign_in/google_sign_in.dart'; 
+import 'package:google_sign_in/google_sign_in.dart';
 
 final googleSignIn = new GoogleSignIn();
 
@@ -118,11 +118,17 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   }
 
   // Handle message submission
-  void _handleSubmitted(String text) {
+  Future<Null> _handleSubmitted(String text) async {
     _textController.clear();
     setState(() {
       _isComposing = false;
     });
+    await _ensureLoggedIn();
+    _sendMessage(text: text);
+  }
+
+  // Handle sending a message logic after the user is ensured to be logged in.
+  void _sendMessage({String text}) {
     ChatMessage message = new ChatMessage(
       text: text,
       animationController: new AnimationController(
@@ -139,10 +145,10 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   // Ensure the user is logged in
   Future<Null> _ensureLoggedIn() async {
     GoogleSignInAccount user = googleSignIn.currentUser;
-    if(user == null){
+    if (user == null) {
       user = await googleSignIn.signInSilently();
     }
-    if(user == null){
+    if (user == null) {
       await googleSignIn.signIn();
     }
   }
