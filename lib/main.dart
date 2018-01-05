@@ -2,6 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
 
+// Asyn package
+import 'dart:async'; 
+
+// Add google signin package
+import 'package:google_sign_in/google_sign_in.dart'; 
+
+final googleSignIn = new GoogleSignIn();
+
 const String _name = "Your Name";
 
 // Defining the theme data.
@@ -40,6 +48,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
   final TextEditingController _textController = new TextEditingController();
   bool _isComposing = false;
 
+  // Widget to entering and sending messages.
   Widget _buildTextComposer() {
     return new IconTheme(
         data: new IconThemeData(color: Theme.of(context).accentColor),
@@ -108,6 +117,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         ));
   }
 
+  // Handle message submission
   void _handleSubmitted(String text) {
     _textController.clear();
     setState(() {
@@ -124,6 +134,17 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       _messages.insert(0, message);
     });
     message.animationController.forward();
+  }
+
+  // Ensure the user is logged in
+  Future<Null> _ensureLoggedIn() async {
+    GoogleSignInAccount user = googleSignIn.currentUser;
+    if(user == null){
+      user = await googleSignIn.signInSilently();
+    }
+    if(user == null){
+      await googleSignIn.signIn();
+    }
   }
 
   // If the app consists from more screen, the framework will invoke this method and clear
