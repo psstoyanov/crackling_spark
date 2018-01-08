@@ -1,3 +1,4 @@
+// Base libs for the app
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
@@ -9,6 +10,10 @@ import 'dart:async';
 import 'package:google_sign_in/google_sign_in.dart';
 // Firebase auth
 import 'package:firebase_auth/firebase_auth.dart';  
+
+// Firebase database and additional lib for UI enhancement
+import 'package:firebase_database/firebase_database.dart'; 
+import 'package:firebase_database/ui/firebase_animated_list.dart';
 
 // Firebase analytics
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -53,8 +58,8 @@ class ChatScreen extends StatefulWidget {
   State createState() => new ChatScreenState();
 }
 
-class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
-  final List<ChatMessage> _messages = <ChatMessage>[];
+class ChatScreenState extends State<ChatScreen>{
+  final firebaseDBReference = FirebaseDatabase.instance.reference().child('messages');
   final TextEditingController _textController = new TextEditingController();
   bool _isComposing = false;
 
@@ -108,12 +113,18 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
         body: new Container(
           child: new Column(children: <Widget>[
             new Flexible(
-                child: new ListView.builder(
-              padding: new EdgeInsets.all(8.0),
-              reverse: true,
-              itemBuilder: (_, int index) => _messages[index],
-              itemCount: _messages.length,
-            )),
+                child: new FirebaseAnimatedList(
+                  query: firebaseDBReference,
+                  sort: (a, b) => b.key.compareTo(a.key),
+                  padding: new EdgeInsets.all(8.0),
+                  reverse: true,
+                  itemBuilder: (_, DataSnapshot snapshot, Animation<double> animation){
+                    return new ChatMessage(
+                      snapshot: snapshot,
+                      animation: animation
+                    );
+                  },
+                )),
             new Container(
               decoration: new BoxDecoration(color: Theme.of(context).cardColor),
               child: _buildTextComposer(),
@@ -139,17 +150,12 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
 
   // Handle sending a message logic after the user is ensured to be logged in.
   void _sendMessage({String text}) {
-    ChatMessage message = new ChatMessage(
-      text: text,
-      animationController: new AnimationController(
-        duration: new Duration(milliseconds: 300),
-        vsync: this,
-      ),
-    );
-    setState(() {
-      _messages.insert(0, message);
+    // Push the message to the Firebase db reference
+    firebaseDBReference.push().set({
+      'text': text,
+      'senderName': googleSignIn.currentUser.displayName,
+      'senderPhotoUrl': googleSignIn.currentUser.photoUrl
     });
-    message.animationController.forward();
     analytics.logEvent(name: 'send message');
   }
 
@@ -173,31 +179,22 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       );
     }
   }
-
-  // If the app consists from more screen, the framework will invoke this method and clear
-  // the animation resources.
-  @override
-  void dispose() {
-    for (ChatMessage message in _messages)
-      message.animationController.dispose();
-    super.dispose();
-  }
 }
 
 class ChatMessage extends StatelessWidget {
-  ChatMessage({this.text, this.animationController});
-  final String text;
-  final AnimationController animationController;
+  ChatMessage({this.snapshot, this.animation});
+  final DataSnapshot snapshot;
+  final Animation animation;
 
   @override
   Widget build(BuildContext context) {
     return new SizeTransition(
         sizeFactor: new CurvedAnimation(
-            parent: animationController, curve: Curves.decelerate),
+            parent: animation, curve: Curves.decelerate),
         axisAlignment: -20.0, // Useful to make the animation more "believable"
         child: new FadeTransition(
           opacity: new CurvedAnimation(
-              parent: animationController,
+              parent: animation,
               curve: const Interval(0.6, 1.0, curve: Curves.linear)),
           child: new Container(
             margin: new EdgeInsets.symmetric(vertical: 8.0),
@@ -208,17 +205,17 @@ class ChatMessage extends StatelessWidget {
                   margin: new EdgeInsets.only(right: 16.0),
                   child: new CircleAvatar(
                       backgroundImage:
-                          new NetworkImage(googleSignIn.currentUser.photoUrl)),
+                          new NetworkImage(snapshot.value['senderPhotoUrl'])),
                 ),
                 new Expanded(
                   child: new Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: <Widget>[
-                      new Text(googleSignIn.currentUser.displayName,
+                      new Text(snapshot.value['senderName'],
                           style: Theme.of(context).textTheme.subhead),
                       new Container(
                         margin: const EdgeInsets.only(top: 5.0),
-                        child: new Text(text),
+                        child: new Text(snapshot.value['text']),
                       )
                     ],
                   ),
