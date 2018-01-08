@@ -7,11 +7,17 @@ import 'dart:async';
 
 // Google signin package
 import 'package:google_sign_in/google_sign_in.dart';
+// Firebase auth
+import 'package:firebase_auth/firebase_auth.dart';  
 
 // Firebase analytics
 import 'package:firebase_analytics/firebase_analytics.dart';
 
+// SignIn and User auth
 final googleSignIn = new GoogleSignIn();
+final auth = FirebaseAuth.instance;
+
+// Analytics
 final analytics = new FirebaseAnalytics();
 
 const String _name = "Your Name";
