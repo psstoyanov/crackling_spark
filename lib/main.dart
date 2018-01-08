@@ -91,6 +91,7 @@ class ChatScreenState extends State<ChatScreen>{
                   StorageUploadTask uploadTask = ref.put(imageFile);
                   Uri downloadUri = (await uploadTask.future).downloadUrl;
                   _sendMessage(imageUrl: downloadUri.toString());
+                  analytics.logEvent(name: 'send_image');
                 }
               ),
             ),
@@ -181,7 +182,7 @@ class ChatScreenState extends State<ChatScreen>{
       'senderName': googleSignIn.currentUser.displayName,
       'senderPhotoUrl': googleSignIn.currentUser.photoUrl
     });
-    analytics.logEvent(name: 'send message');
+    analytics.logEvent(name: 'send_message');
   }
 
   // Ensure the user is logged in
