@@ -163,6 +163,15 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
       await googleSignIn.signIn();
       analytics.logLogin();
     }
+    // Ensure the user has logged in
+    if(await auth.currentUser() == null){
+      GoogleSignInAuthentication credentials = 
+      await googleSignIn.currentUser.authentication;
+      await auth.signInWithGoogle(
+        idToken: credentials.idToken,
+        accessToken: credentials.accessToken
+      );
+    }
   }
 
   // If the app consists from more screen, the framework will invoke this method and clear
