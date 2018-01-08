@@ -37,12 +37,12 @@ const String _name = "Your Name";
 
 // Defining the theme data.
 final ThemeData kIOSTheme = new ThemeData(
-    primarySwatch: Colors.orange,
+    primarySwatch: Colors.purple,
     primaryColor: Colors.grey[100],
     primaryColorBrightness: Brightness.light);
 
 final ThemeData kDefaultTheme = new ThemeData(
-    primarySwatch: Colors.purple, accentColor: Colors.orangeAccent[400]);
+    primarySwatch: Colors.purple, accentColor: Colors.purpleAccent[400]);
 
 void main() {
   runApp(new CracklingsparkApp());
@@ -82,7 +82,10 @@ class ChatScreenState extends State<ChatScreen>{
               margin: new EdgeInsets.symmetric(horizontal: 4.0),
               child: new IconButton(
                 icon: new Icon(Icons.photo_album),
-                onPressed: () {}
+                onPressed: () async {
+                  await _ensureLoggedIn();
+                  File imageFile = await ImagePicker.pickImage();
+                }
               ),
             ),
             new Flexible(
