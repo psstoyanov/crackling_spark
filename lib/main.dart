@@ -5,10 +5,14 @@ import 'package:flutter/foundation.dart';
 // Asyn package
 import 'dart:async';
 
-// Add google signin package
+// Google signin package
 import 'package:google_sign_in/google_sign_in.dart';
 
+// Firebase analytics
+import 'package:firebase_analytics/firebase_analytics.dart';
+
 final googleSignIn = new GoogleSignIn();
+final analytics = new FirebaseAnalytics();
 
 const String _name = "Your Name";
 
