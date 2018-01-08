@@ -154,6 +154,7 @@ class ChatScreenState extends State<ChatScreen> with TickerProviderStateMixin {
     }
     if (user == null) {
       await googleSignIn.signIn();
+      analytics.logLogin();
     }
   }
 
