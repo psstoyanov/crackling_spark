@@ -85,6 +85,12 @@ class ChatScreenState extends State<ChatScreen>{
                 onPressed: () async {
                   await _ensureLoggedIn();
                   File imageFile = await ImagePicker.pickImage();
+                  // Use random image name and upload to Firebase
+                  int random = new Random().nextInt(10000);
+                  StorageReference ref = FirebaseStorage.instance.ref().child("image_$random.jpg");
+                  StorageUploadTask uploadTask = ref.put(imageFile);
+                  Uri downloadUri = (await uploadTask.future).downloadUrl;
+                  _sendMessage(imageUrl: downloadUri.toString());
                 }
               ),
             ),
@@ -167,10 +173,11 @@ class ChatScreenState extends State<ChatScreen>{
   }
 
   // Handle sending a message logic after the user is ensured to be logged in.
-  void _sendMessage({String text}) {
+  void _sendMessage({String text, String imageUrl}) {
     // Push the message to the Firebase db reference
     firebaseDBReference.push().set({
       'text': text,
+      'imageUrl': imageUrl,
       'senderName': googleSignIn.currentUser.displayName,
       'senderPhotoUrl': googleSignIn.currentUser.photoUrl
     });
