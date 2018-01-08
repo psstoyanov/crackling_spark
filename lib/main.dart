@@ -2,6 +2,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/foundation.dart';
+import 'package:image_picker/image_picker.dart';
+
+// Libs for randomly generated name to the files and IO
+import 'dart:math';
+import 'dart:io';
 
 // Asyn package
 import 'dart:async';
@@ -14,6 +19,9 @@ import 'package:firebase_auth/firebase_auth.dart';
 // Firebase database and additional lib for UI enhancement
 import 'package:firebase_database/firebase_database.dart'; 
 import 'package:firebase_database/ui/firebase_animated_list.dart';
+
+// Firebase storage plugin to support file sharing (photos)
+import 'package:firebase_storage/firebase_storage.dart';
 
 // Firebase analytics
 import 'package:firebase_analytics/firebase_analytics.dart';
@@ -70,8 +78,15 @@ class ChatScreenState extends State<ChatScreen>{
         child: new Container(
           margin: const EdgeInsets.symmetric(horizontal: 8.0),
           child: new Row(children: <Widget>[
+            new Container( // Upload photo button
+              margin: new EdgeInsets.symmetric(horizontal: 4.0),
+              child: new IconButton(
+                icon: new Icon(Icons.photo_album),
+                onPressed: () {}
+              ),
+            ),
             new Flexible(
-              child: new TextField(
+              child: new TextField( // Message field
                 controller: _textController,
                 onChanged: (String text) {
                   setState(() {
@@ -83,16 +98,16 @@ class ChatScreenState extends State<ChatScreen>{
                     hintText: "Send text message"),
               ),
             ),
-            new Container(
+            new Container( // Submit message button
                 margin: new EdgeInsets.symmetric(horizontal: 4.0),
                 child: Theme.of(context).platform == TargetPlatform.iOS
-                    ? new CupertinoButton(
+                    ? new CupertinoButton( // iOS style submit button
                         child: new Text("Send"),
                         onPressed: _isComposing
                             ? () => _handleSubmitted(_textController.text)
                             : null,
                       )
-                    : new IconButton(
+                    : new IconButton( // Android style submit button
                         icon: new Icon(Icons.send),
                         onPressed: _isComposing
                             ? () => _handleSubmitted(_textController.text)
